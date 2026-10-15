@@ -227,6 +227,12 @@
       margin-top: 25px;
     }
 
+    .shortcut-help {
+      margin: 15px 0 -15px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
     .answer {
       display: flex;
       min-height: 56px;
@@ -463,7 +469,8 @@
           <div class="question-area">
             <p class="eyebrow">Space explorer quiz</p>
             <h2 id="question" tabindex="-1"></h2>
-            <div class="answers" id="answers" role="group" aria-labelledby="question"></div>
+            <p class="shortcut-help" id="keyboard-help">Keyboard shortcuts: press 1–4 to choose an answer. Press Enter to check it, then press Enter again to continue.</p>
+            <div class="answers" id="answers" role="group" aria-labelledby="question" aria-describedby="keyboard-help"></div>
             <p class="feedback" id="feedback" aria-live="polite"></p>
           </div>
         </div>
@@ -695,6 +702,23 @@
     document.getElementById("start-button").addEventListener("click", startQuiz);
     document.getElementById("restart-button").addEventListener("click", startQuiz);
     nextButton.addEventListener("click", advance);
+
+    document.addEventListener("keydown", (event) => {
+      if (quizContent.hidden || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+
+      if (/^[1-4]$/.test(event.key)) {
+        const index = Number(event.key) - 1;
+        if (selected === null && index < answersEl.children.length) {
+          selectAnswer(index);
+          answersEl.children[index].focus();
+        }
+        return;
+      }
+
+      if (event.key !== "Enter" || (selected === null && nextButton.dataset.checked !== "true")) return;
+      event.preventDefault();
+      if (!event.repeat) advance();
+    });
   </script>
 </body>
 </html>
